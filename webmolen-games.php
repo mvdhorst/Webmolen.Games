@@ -98,23 +98,25 @@ function gti_getgames($team='alles',$beginday=0,$endday=0) {
 	$dagen_short = array('Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za');	
 	$done_date = "";
 	
-	$retval .= '			<table width="100%">
-			<caption>Programma</caption>';
+	$retval .= '			<table width="100%">';
+	//$retval .= '		'<caption>Programma</caption>';
 			
 			$first = true;
 			if ($team=='alles')
 			{ 
 	$retval .=' 		<thead>
 				<tr>
-				<th>Nummer</th>
+				<th style="width:65px;">Datum</th>
 				<th>Tijd</th>
+				<th>Nr</th>
 				<th>Team</th>
 				<th>Thuis</th>
 				<th>Uit</th>
 				<th>V</th>
 				<th>Scheids</th>
 				</tr>
-				</thead>	' ;
+				</thead>
+				<tbody>';
 
 				if($games != null)
 				{
@@ -170,51 +172,53 @@ function gti_getgames($team='alles',$beginday=0,$endday=0) {
 						{
 							// $aanwtijd = "";
 							$datum = strtotime($wedstrijd->game_date);
-							$aanwdatum = strtotime($wedstrijd->time_present);
 							$weddag = date('w',$datum);
 							$weddatum = date('d-m',$datum);
 							$wedtijd = date('H:i',$datum);
 							
-							$weddag = $dagen[$weddag]; 
+							$weddag = $dagen_short[$weddag]; 
 							if(preg_match('/Alcmaria|Nighthawks/',$wedstrijd->home )){
 								$wedstrijd->home = '<b>' . $wedstrijd->home . '</b>';
 							} else if(preg_match('/Alcmaria|Nighthawks/',$wedstrijd->away ))  {
 								$wedstrijd->away = '<b>' . $wedstrijd->away . '</b>';	
 							}
 							
-							if($weddatum != $done_date){
-								$retval .=  "<tr><td colspan='7' class='table-header table-header-date'>".$weddag. " " . $weddatum . "</td></tr>";
-								$done_date = $weddatum; 
-								if(!$first)
-								{
-									$retval .= "<tr class='table-header-gegevens'>";
-									$retval .=  "<td>Nummer</td>";
-									$retval .=  "<td>Tijd</td>";
-									$retval .=  "<td>Team</td>";
-									$retval .=  "<td>Thuis</td>";
-									$retval .=  "<td>Uit</td>";
-									$retval .=  "<td>V</td>";
-									$retval .=  "<td>Scheids</td>";
-									$retval .=  "</tr>	";
-								}
+							// if($weddatum != $done_date){
+								// $retval .=  "<tr><td colspan='7' class='table-header table-header-date'>".$weddag. " " . $weddatum . "</td></tr>";
+								// $done_date = $weddatum; 
+								// if(!$first)
+								// {
+									// $retval .= "<tr class='table-header-gegevens'>";
+									// $retval .=  "<td>Nummer</td>";
+									// $retval .=  "<td>Tijd</td>";
+									// $retval .=  "<td>Team</td>";
+									// $retval .=  "<td>Thuis</td>";
+									// $retval .=  "<td>Uit</td>";
+									// $retval .=  "<td>V</td>";
+									// $retval .=  "<td>Scheids</td>";
+									// $retval .=  "</tr>	";
+								// }
 									
-							}
-						if($home != $wedstrijd->home_game)
-						{
-							$first = false;
-							$home = $wedstrijd->home_game;
-							if($home == 1)
-								$retval .=   "<tr><td colspan='7' class='table-header'>Thuis wedstrijden</td></tr>";
-							else if($home == 0)
-								$retval .=   "<tr><td colspan='7' class='table-header'>Uit wedstrijden</td></tr>";
+							// }
+						// if($home != $wedstrijd->home_game)
+						// {
+							// $first = false;
+							// $home = $wedstrijd->home_game;
+							// if($home == 1)
+								// $retval .=   "<tr><td colspan='7' class='table-header'>Thuis wedstrijden</td></tr>";
+							// else if($home == 0)
+								// $retval .=   "<tr><td colspan='7' class='table-header'>Uit wedstrijden</td></tr>";
 								
-						}		
+						// }		
 							$retval .=   "<tr>
 							<td>";
-							$retval .=  $wedstrijd->game_number;
+							$retval .=  $weddag. " " . $weddatum;
 							$retval .=   "</td>
 							<td>";
 							$retval .= $wedtijd;
+							$retval .=   "</td>			
+							<td>";
+							$retval .=  $wedstrijd->game_number;
 							$retval .=   "</td>			
 							<td>";
 							$retval .=  $wedstrijd->team_naamkort;
@@ -243,7 +247,7 @@ function gti_getgames($team='alles',$beginday=0,$endday=0) {
 					// echo '<tr><td colspan="8"><a href="http://www.alcmariavictrix.nl/ics_export/' . $team . '.ics">Download ICS</a></td></tr>';		
 				}
 				else {
-					$retval .=  "<tr><td colspan='7'>Nog geen wedstrijden bekend</td></tr>";
+					$retval .=  "<tr><td colspan='8'>Nog geen wedstrijden bekend</td></tr>";
 				} 
 			} 
 			else 
