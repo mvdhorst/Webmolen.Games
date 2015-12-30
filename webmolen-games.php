@@ -13,6 +13,40 @@ function gti_admin_actions() {
 
 add_action('admin_menu', 'gti_admin_actions');
 
+// [games team="alles" beginday=0, endday=0]
+function gti_getgamestag( $atts ) {
+    $a = shortcode_atts( array(
+        'team' => 'alles',
+        'beginday' => '0',
+        'endday' => '0',
+    ), $atts );
+
+    return gti_getgames($a['team'], $a['beginday'], $a['endday']);
+}
+add_shortcode( 'games', 'gti_getgamestag' );
+
+// [results team="alles" beginday=0, endday=0]
+function gti_getresultstag( $atts ) {
+    $a = shortcode_atts( array(
+        'team' => 'alles',
+        'beginday' => '0',
+        'endday' => '0',
+    ), $atts );
+
+    return gti_getresults($a['team'], $a['beginday'], $a['endday']);
+}
+add_shortcode( 'results', 'gti_getresultstag' );
+
+// [standings team="alles"]
+function gti_getstandingstag( $atts ) {
+    $a = shortcode_atts( array(
+        'team' => 'alles'
+    ), $atts );
+
+    return gti_getstandings($a['team']);
+}
+add_shortcode( 'standings', 'gti_getstandingstag' );
+
 function gti_getgames($team='alles',$beginday=0,$endday=0) {
 	$retval = '';
 	if (!is_numeric($beginday) || 0 == $beginday)
@@ -61,7 +95,7 @@ function gti_getgames($team='alles',$beginday=0,$endday=0) {
 	$regex = '/[0-9]/';	
 	
 	$dagen = array('Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag');	
-	$dagen_short = array('Zon', 'Maa', 'Din', 'Woe', 'Don', 'Vri', 'Zat');	
+	$dagen_short = array('Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za');	
 	$done_date = "";
 	
 	$retval .= '			<table width="100%">
@@ -214,7 +248,77 @@ function gti_getgames($team='alles',$beginday=0,$endday=0) {
 			} 
 			else 
 			{ 
-
+		$retval .= '
+				<thead>
+				<tr>
+				<th>Nummer</th>
+				<th>Datum</th>
+				<th>Tijd</th>
+				<th>Team</th>
+				<th>Thuis</th>
+				<th>Uit</th>
+				<th>V</th>
+				<th>Scheids</th>
+				</tr>
+				</thead>';
+				if($games != null)
+				{
+					foreach($games as $key => $wedstrijd) 
+					{ 
+						if(stristr($wedstrijd->home, 'Vrij') === false 
+								&& stristr($wedstrijd->away, 'Vrij') === false)
+						{
+							$aanwtijd = "";
+							$datum = strtotime($wedstrijd->game_date);
+							$weddag = date('w',$datum);
+							$weddatum = date('d-m',$datum);
+							$wedtijd = date('H:i',$datum);
+							
+							$weddag = $dagen_short[$weddag]; 
+							if(preg_match('/Alcmaria|Nighthawks/',$wedstrijd->home )){
+								$wedstrijd->home = '<b>' . $wedstrijd->home . '</b>';
+							} else if(preg_match('/Alcmaria|Nighthawks/',$wedstrijd->away ))  {
+								$wedstrijd->away = '<b>' . $wedstrijd->away . '</b>';	
+							}
+							$retval .= '<tr>';
+							$retval .= '<td>';
+							$retval .= $wedstrijd->game_number;
+							$retval .= '</td>';
+							if($wedstrijd->canceled){		
+								$retval .= '<td colspan="2" class="afgelast">-=AFGELAST=-</td>';
+								} else{			
+								$retval .= '<td>';
+								$retval .= $weddag . ' ' . $weddatum;
+								$retval .= '</td>';
+								$retval .= '<td>';
+								$retval .= $wedtijd;
+								$retval .= '</td>';
+								}
+							$retval .= '<td>';
+							$retval .= $wedstrijd->team_naamkort;
+							$retval .= '</td>';
+							$retval .= '<td>';
+							$retval .= $wedstrijd->home;
+							$retval .= '</td>';
+							$retval .= '<td>';
+							$retval .= $wedstrijd->away;
+							$retval .= '</td>';
+							if($wedstrijd->canceled){ 
+								$retval .= '<td colspan="2" class="afgelast">-=AFGELAST=-</td>';
+							} else{				
+								$retval .= '<td>';
+								$retval .= $wedstrijd->field;
+								$retval .= '</td>';
+								$retval .= '<td>';
+								$retval .= $wedstrijd->umpire;
+								$retval .= '</td>';
+							}	
+							$retval .= '</tr>';
+								
+						} 
+					}
+					$retval .=  '<tr><td colspan="8"><a href="http://www.alcmariavictrix.nl/ics_export/' . $team . '.ics"><span style="height: 30px;    vertical-align: center;padding-top: 9px;display: table-cell;text-align: center;"><img src="http://www.alcmariavictrix.nl/images/calendar-icon.png" height="20" width="20" style="border:none;vertical-align: middle;padding-right: 5px;"/><span>Toevoegen aan agenda</span></span></a></td></tr>';
+				} else{ echo "<tr><td colspan='8'>Nog geen wedstrijden bekend</td></tr>";} 
 			}
 			//print_r($events);
 			// $export->setTitle("AV " . $team . " Wedstrijden");
@@ -224,6 +328,7 @@ function gti_getgames($team='alles',$beginday=0,$endday=0) {
 			$retval .= "</table>";
 			return $retval;
 }
+
 function gti_getresults($team='alles',$beginday=0,$endday=0) {
 	$retval = '';
 	if (!is_numeric($beginday) || 0 == $beginday)
@@ -384,8 +489,46 @@ function gti_getresults($team='alles',$beginday=0,$endday=0) {
 
 function gti_getteam($team='') {
 
+	$retval = '';
+	return $retval;
 }
-function gti_getstandings($team='alles') {
 
+function gti_getstandings($team='alles') {
+	$retval = '';
+	if($team == 'alles'){
+		$query ="SELECT `Stand`.`content`, `Stand`.`stamp`, `Team`.`team_naam` FROM `standings` AS `Stand` LEFT JOIN `competitions` AS `Competition` 
+		ON (`Stand`.`competition_id` = `Competition`.`competition_id`) LEFT JOIN `teams` AS `Team` ON (`Competition`.`team_id` = `Team`.`team_id`) ORDER BY Competition.sortordernr ASC";
+	//$query = "SELECT standings.* FROM standings INNER JOIN teams ON stand.team_id = teams.team_id ORDER BY teams.sport_id ASC, teams.compNr ASC";
+
+	} else {
+		//if (in_array($team,$teams)){
+		$query ="SELECT `Stand`.`content`, `Stand`.`stamp` FROM `standings` AS `Stand` LEFT JOIN `competitions` AS `Competition` 
+		ON (`Stand`.`competition_id` = `Competition`.`competition_id`) LEFT JOIN `teams` AS `Team` ON (`Competition`.`team_id` = `Team`.`team_id`)
+		WHERE `Team`.`team_naamkort` = '" . $team . "' ORDER BY `Competition`.`name` ASC";	 
+		//$query = "SELECT stand.* FROM stand WHERE team_id = " . $team;		
+	} 
+	
+	global $wpdb;
+	$standen = $wpdb->get_results($query);
+	
+		
+	$even = false;
+	if($standen[0]){
+	$retval .= 'standen per ' . date('d-m',strtotime($standen[0]->stamp)) . ', bron knbsb.nl';
+	$retval .= '<div style="width:100%">';
+	foreach($standen as $key => $stand) {
+		if($team == 'alles'){
+			$retval .= '<div class="standen"><h3>' . $stand->team_naam . '</h3>' . $stand->content . '</div>';
+		} else {
+			$retval .= $stand['content'];
+		}
+	}
+	$retval .= '</div>';
+	$retval .= '<div class="clear"></div>';
+
+	} else 
+		$retval .= 'Geen standen beschikbaar';
+	
+	return $retval;
 }
 ?>
