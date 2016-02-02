@@ -149,20 +149,21 @@ function gti_getgames($team='alles',$beginday=0,$endday=0,$playfield='all',$max=
 	$dagen_short = array('Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za');	
 	$done_date = "";
 	
-	$retval .= '			<table width="100%">';
+	$retval .= '			<div class="clubData-style">';
+	$retval .= '			<table class="article-hs">';
 	//$retval .= '		'<caption>Programma</caption>';
 			
 	$first = true;
 	$retval .=' 		<thead>
 				<tr>
-				<th style="width:71px;">Datum</th>
-				<th>Tijd</th>
-				<th>Nr</th>
-				<th>Team</th>
-				<th>Thuis</th>
-				<th>Uit</th>
-				<th>V</th>
-				<th>Scheids</th>
+				<th style="width:71px;" class="header">Datum</th>
+				<th class="header">Tijd</th>
+				<th class="header">Nr</th>
+				<th class="header displayNotMobile">Team</th>
+				<th class="header">Thuis</th>
+				<th class="header">Uit</th>
+				<th class="header displayNotMobile">V</th>
+				<th class="header displayNotMobile">Scheids</th>
 				</tr>
 				</thead>
 				<tbody>';
@@ -171,6 +172,7 @@ function gti_getgames($team='alles',$beginday=0,$endday=0,$playfield='all',$max=
 	{	
 		$retval .=  "<tr><td colspan='8'>Nog geen wedstrijden bekend</td></tr>";
 		$retval .= "</tbody></table>";
+		$retval .= "</div>";
 		return $retval;					
 	}
 	$sortedGames = array();
@@ -275,6 +277,7 @@ function gti_getgames($team='alles',$beginday=0,$endday=0,$playfield='all',$max=
 	{
 		$retval .=  '<p><a href="http://www.alcmariavictrix.nl/ics_export/' . $team . '.ics"><span style="height: 30px;    vertical-align: center;padding-top: 9px;display: table-cell;text-align: center;"><img src="http://www.alcmariavictrix.nl/images/calendar-icon.png" height="20" width="20" style="border:none;vertical-align: middle;padding-right: 5px;"/><span>Toevoegen aan agenda</span></span></a></p>';
 	}
+	$retval .= '</div>';
 	return $retval;
 }
 
@@ -338,15 +341,16 @@ function gti_getresults($team='alles',$beginday=0,$endday=0,$max=0) {
 	$dagen_short = array('Zon', 'Maa', 'Din', 'Woe', 'Don', 'Vri', 'Zat');	
 	$done_date = "";
 	
-	$retval .= '			<table width="100%">';
+	$retval .= '			<div class="clubData-style">';
+	$retval .= '			<table class="article-hs">';
 	$retval .=' 		<thead>
 			<tr>
-			<th style="width:71px;">Datum</th>
-			<th>Tijd</th>
-			<th>Nr</th>
-			<th>Team</th>
-			<th>Thuis</th>
-			<th>Uit</th>
+			<th style="width:71px;" class="header">Datum</th>
+			<th class="header displayNotMobile">Tijd</th>
+			<th class="header displayNotMobile">Nr</th>
+			<th class="header displayNotMobile">Team</th>
+			<th class="header">Thuis</th>
+			<th class="header">Uit</th>
 			<th>Uitslag</th>
 			</tr>
 			</thead>
@@ -355,6 +359,7 @@ function gti_getresults($team='alles',$beginday=0,$endday=0,$max=0) {
 	if($games == null){
 		$retval .= "<tr><td colspan='7'>Nog geen uitslagen bekend</td></tr>";
 		$retval .= "</tbody></table>";
+		$retval .= "</div>";
 		return $retval;
 	}
 	$sortedGames = array();
@@ -434,6 +439,7 @@ function gti_getresults($team='alles',$beginday=0,$endday=0,$max=0) {
 		}
 	} 
 	$retval .= "</tbody></table>";
+	$retval .= "</div>";
 	return $retval;
 }
 
@@ -464,6 +470,8 @@ function gti_getstandings($team='alles') {
 		
 	$even = false;
 	if($standen[0]){
+		
+	$retval .= '<div class="clubData-style">';
 	$retval .= 'standen per ' . date('d-m',strtotime($standen[0]->stamp)) . ', bron knbsb.nl';
 	$retval .= '<div style="width:100%">';
 	foreach($standen as $key => $stand) {
@@ -475,6 +483,7 @@ function gti_getstandings($team='alles') {
 	}
 	$retval .= '</div>';
 	$retval .= '<div class="clear"></div>';
+	$retval .= '</div>';
 
 	} else 
 		$retval .= 'Geen standen beschikbaar';
